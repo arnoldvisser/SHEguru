@@ -1,0 +1,17 @@
+SHEGURU — FIRST LAPTOP APPLICATION
+
+1. Extract this ZIP completely into Documents\SHEguru.
+2. Install Python 3.10 or newer if it is not already installed:
+   https://www.python.org/downloads/windows/
+3. Double-click Start-SHEguru.bat.
+4. Keep the black command window open. Your browser should open SHEguru.
+5. Start with Settings, or choose Explore with demo records on Overview.
+
+Do not double-click web/index.html. It needs the local app server.
+
+The app saves your records in data\sheguru.sqlite3.
+Download a full backup from Settings regularly.
+
+This is the first evaluation version. Payroll integration, online training,
+certificate issuance, incident management and risk registers come in later stages.
+See README.md for details and backup/restore instructions.
