@@ -15,3 +15,11 @@ Download a full backup from Settings regularly.
 This is the first evaluation version. Payroll integration, online training,
 certificate issuance, incident management and risk registers come in later stages.
 See README.md for details and backup/restore instructions.
+
+VERSION 0.3: APPOINTMENT AND DOCUMENT CHECKLISTS
+Appointments: review the listed requirements, assign people and link signed letters.
+Documents: review company document requirements and upload the evidence.
+Reports: see missing items and print / save a PDF report.
+Not every starter item applies to every company. Record applicability decisions.
+Before updating an existing installation, download a full backup and keep the old
+folder. See README.md for safe update and restore steps.

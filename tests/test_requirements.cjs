@@ -1,0 +1,32 @@
+const fs=require('node:fs'), vm=require('node:vm'), assert=require('node:assert/strict');
+const nodes=new Map();
+const node=k=>{if(!nodes.has(k))nodes.set(k,{content:'token',innerHTML:'',textContent:'',style:{},classList:{remove(){},toggle(){}},isConnected:true});return nodes.get(k)};
+const context={document:{querySelector:node,querySelectorAll:()=>[],addEventListener(){}},console,Intl,Date,crypto:require('node:crypto').webcrypto,structuredClone,setTimeout:()=>0,clearTimeout(){},window:{},fetch(){throw Error('Unexpected fetch')}};
+vm.createContext(context);
+let code=fs.readFileSync(require('node:path').join(__dirname,'../web/app.js'),'utf8');
+vm.runInContext(code.slice(0,code.lastIndexOf('\nload().then(render)')),context);
+(async()=>{
+await vm.runInContext(`(async()=>{
+state={company:{name:'Example <unsafe>',industry:'Workshop',location:'Gauteng'},employees:[{id:'e1',name:'First employee',active:true},{id:'e2',name:'Replacement',active:true}],appointments:[{id:'a1',role:'First aider',employee:'e1',due:offset(30)}],training:[],tasks:[],requirements:[]};
+const r={id:'r1',kind:'appointment',name:'First aider <script>',legalBasis:'Test basis',condition:'Test condition',notes:'Follow up',applicability:'pending',appointment:'',document:'',evidenceEmployee:'',due:'',reason:''};
+state.requirements=[r];
+const check=(expected)=>{if(requirementStatus(r).label!==expected)throw Error(expected+' not detected: '+requirementStatus(r).label)};
+check('Review required');r.applicability='required';check('Appointee missing');r.appointment='a1';check('Signed letter missing');r.document='file1';check('New signed letter needed');r.evidenceEmployee='e1';check('Evidence recorded');
+state.employees[0].active=false;check('Appointee missing');state.employees[0].active=true;
+state.appointments[0].employee='e2';check('New signed letter needed');r.evidenceEmployee='e2';check('Evidence recorded');
+r.due=offset(-1);check('Review overdue');r.due='';state.appointments[0].due=offset(-1);check('Review overdue');state.appointments[0].due=offset(30);
+r.applicability='excluded';r.reason='Not needed at this site';check('Not applicable');if(requirementStatus(r).outstanding)throw Error('Excluded counted outstanding');
+r.applicability='required';
+const d={...r,id:'d1',kind:'document',name:'Risk assessment',appointment:'',evidenceEmployee:'',document:''};state.requirements.push(d);
+if(requirementStatus(d).label!=='Upload missing')throw Error('Company document does not need upload');
+if(outstandingCount()!==1)throw Error('Incorrect outstanding count');
+evidenceFiles=[{id:'file1',name:'signed-first-aider.pdf'}];const html=report();
+for(const text of ['1 outstanding','signed-first-aider.pdf','Upload missing','First aider &lt;script&gt;','Example &lt;unsafe&gt;','Follow up','Test basis'])if(!html.includes(text))throw Error('Missing report data: '+text);
+if(!checklist('appointment').includes('Review / link evidence'))throw Error('Missing checklist action');
+state.appointments.push({id:'a2',role:'Unlinked appointment',employee:'',due:offset(30)});
+if(outstandingCount()!==2||!report().includes('Unlinked appointment'))throw Error('Unlinked appointment missing from report');
+api=async()=>evidenceFiles;page='Reports';await render();
+if(!document.querySelector('#view').innerHTML.includes('2 outstanding'))throw Error('Report page did not render');
+console.log('Checklist checks passed: applicability, missing appointee / upload, employee departure and replacement, review dates, exclusions, report totals, filenames, notes, escaping and unlinked appointments.');
+})()`,context);
+})().catch(e=>{console.error(e);process.exitCode=1});

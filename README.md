@@ -1,4 +1,4 @@
-# SHEguru — laptop application, v0.2
+# SHEguru — laptop application, v0.3
 
 Health and safety record management for a South African SME. This first application edition runs on one laptop, opens in a browser and saves data in SQLite. It has no third-party runtime dependencies and no online account is required.
 
@@ -13,6 +13,26 @@ Health and safety record management for a South African SME. This first applicat
 Visual Studio Code is optional. Opening `web/index.html` directly will not run the application; use the launcher.
 
 On macOS/Linux: `python3 server.py`. Advanced options: `python server.py --no-browser --port 8766 --data-dir /path/to/records`.
+
+## Appointment and company-document checklists (v0.3)
+
+SHEguru targets SMEs with 10 or more employees across industries. This is a product scope, not a universal statutory threshold: duties apply according to the relevant legislation, workplace and hazards. For example, OHS Act section 17 generally uses more than 20 employees at a workplace for health and safety representative designation.
+
+- **Appointments** includes 16 starter role categories; **Documents** includes 18 starter document categories. Each shows a legal / regulatory reference and applicability notes, including conditional construction, machinery and chemical requirements. The source catalogue is `requirements.json`.
+- Review each requirement as **Required**, **Not applicable** (with a reason), or leave it as **Review required**. Add company-specific requirements, including separate people, shifts or sites. The starter catalogue is for workplace review, not an exhaustive or independently verified current legal register. Mines, specialist industries, municipal rules and client requirements may need additional items and competent advice.
+- Create the appointee in the appointment register, then use **Review / link evidence** on the corresponding requirement to link that appointment. Upload its signed letter directly from the requirement, or link an existing library file. Confirm that the letter names the active appointee. The software records that confirmation; it does not authenticate signatures, qualifications or document contents.
+- An applicable appointment stays outstanding until it has an active appointee and linked signed evidence. Changing the appointee requires new confirmation / evidence. Unlinked appointment records also appear as outstanding on the report.
+- Company documents stay outstanding until an upload is linked. Optional evidence review / expiry dates and appointment review dates flag overdue items.
+- **Reports** includes all requirements, outstanding statuses, assigned people, uploaded filenames, legal references, applicability reasons and notes. Use **Print / save PDF** to export it. Pending applicability decisions are counted separately in the summary and included in the outstanding total. “Evidence recorded” is not a compliance certification.
+- Old databases gain the starter checklist without deleting existing records or uploads. Checklists and links are retained in the full SQLite backup. No separate database conversion command is needed.
+
+### Updating a Windows installation safely
+
+1. In the old app, use **Settings → Download full backup**; keep that backup separate.
+2. Close the app’s command window and browser tabs.
+3. Extract the updated download into a **new folder**, keeping the old installation intact. The new folder must include `requirements.json`, `server.py`, the launchers and the complete `web` directory.
+4. To keep existing records, create a `data` folder inside the new folder and copy the backup into it as `sheguru.sqlite3`. Preserve the original backup.
+5. Run **Start-SHEguru.bat** in the new folder. Reopen the browser so it loads the new version. Confirm the sidebar says **Laptop edition · 0.3**.
 
 ## Working features
 
@@ -67,11 +87,14 @@ Run:
 python -m unittest discover -s tests -v
 node --check web/app.js
 node tests/test_frontend.cjs
+node tests/test_requirements.cjs
 ```
 
 Python and Node tests cover saved-record persistence, employee-departure audit entries, referential and date validation, save conflicts, file round trips, full backup restoration, local access controls, alert logic, text escaping and screen rendering functions. Node is needed for development checks only, not to run the application.
 
 Automated checks passed in Linux. Interactive browser layout, printing and the Windows launcher still require testing on a Windows laptop.
+
+Checklist and evidence flows were also exercised in headless Chromium on Linux, including signed-letter and company-document uploads, report PDF generation, reassignment and reload persistence. Windows interactive printing still needs evaluation on the laptop.
 
 ## Development priorities
 

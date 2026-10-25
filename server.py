@@ -17,7 +17,18 @@ from urllib.parse import urlsplit, quote
 ROOT = Path(__file__).resolve().parent
 MAX_REQUEST = 16 * 1024 * 1024
 MAX_FILE = 10 * 1024 * 1024
-GROUPS = ('employees', 'appointments', 'training', 'tasks')
+GROUPS = ('employees', 'appointments', 'training', 'tasks', 'requirements')
+
+
+def starter_requirements():
+    return json.loads((ROOT / 'requirements.json').read_text())
+
+
+def migrate(state):
+    # Add the checklist without changing existing records or attachment data.
+    if 'requirements' not in state:
+        state['requirements'] = starter_requirements()
+    return state
 
 
 def now():
@@ -26,7 +37,7 @@ def now():
 
 def empty_state():
     return {'schemaVersion': 1, 'company': {'name': '', 'industry': '', 'location': ''},
-            **{key: [] for key in GROUPS}}
+            **{key: [] for key in GROUPS}, 'requirements': starter_requirements()}
 
 
 class Invalid(ValueError):
@@ -112,6 +123,28 @@ def validate(state):
         date(item.get('due'), 'reminder date')
         if type(item.get('done')) is not bool:
             raise Invalid('Invalid reminder status.')
+    for item in state['requirements']:
+        if item.get('kind') not in ('appointment', 'document'):
+            raise Invalid('Invalid requirement kind.')
+        text(item.get('name'), 'requirement title', True, 200)
+        for key, limit in (('legalBasis', 500), ('condition', 2000), ('reason', 2000), ('notes', 5000)):
+            text(item.get(key), key, limit=limit)
+        if item.get('applicability') not in ('pending', 'required', 'excluded'):
+            raise Invalid('Invalid applicability.')
+        if item['applicability'] == 'excluded' and not item['reason'].strip():
+            raise Invalid('Explain why this requirement does not apply.')
+        for key in ('appointment', 'document', 'evidenceEmployee'):
+            text(item.get(key), key, limit=80)
+        if item['appointment'] and item['appointment'] not in {a['id'] for a in state['appointments']}:
+            raise Invalid('Appointment reference does not exist.')
+        if item['evidenceEmployee'] and item['evidenceEmployee'] not in people:
+            raise Invalid('Evidence employee reference does not exist.')
+        if item['kind'] == 'document' and (item['appointment'] or item['evidenceEmployee']):
+            raise Invalid('Company documents cannot refer to an appointment.')
+        if item.get('due'):
+            date(item['due'], 'requirement review date')
+        elif item.get('due') != '':
+            raise Invalid('Invalid requirement review date.')
     return state
 
 
@@ -169,9 +202,13 @@ class Store:
     def state(self):
         with self.connect() as con:
             row = con.execute('SELECT * FROM workspace WHERE id=1').fetchone()
-            return {'revision': row['revision'], 'state': json.loads(row['payload'])}
+            return {'revision': row['revision'], 'state': migrate(json.loads(row['payload']))}
 
     def save(self, state, revision):
+        if not isinstance(state, dict):
+            raise Invalid('Invalid workspace.')
+        if 'requirements' not in state:
+            raise Invalid('Reopen SHEguru to load the requirements checklist before saving.')
         validate(state)
         if type(revision) is not int:
             raise Invalid('Missing workspace revision.')
@@ -180,7 +217,15 @@ class Store:
             row = con.execute('SELECT * FROM workspace WHERE id=1').fetchone()
             if row['revision'] != revision:
                 raise Conflict('Another tab changed these records. Reload and try again.')
-            action = summary(json.loads(row['payload']), state)
+            before = migrate(json.loads(row['payload']))
+            # Old tabs must not silently discard a checklist created by a newer client.
+            if before['requirements'] and not state['requirements']:
+                raise Invalid('The requirements checklist cannot be removed.')
+            file_ids = {r[0] for r in con.execute('SELECT id FROM attachments')}
+            for requirement in state['requirements']:
+                if requirement['document'] and requirement['document'] not in file_ids:
+                    raise Invalid('The evidence document does not exist.')
+            action = summary(before, state)
             con.execute('UPDATE workspace SET revision=revision+1,payload=? WHERE id=1', (json.dumps(state),))
             con.execute('INSERT INTO audit(timestamp,action) VALUES(?,?)', (now(), action))
         return self.state()
@@ -217,7 +262,7 @@ class Store:
 
 
 class Handler(BaseHTTPRequestHandler):
-    server_version = 'SHEguru/0.2'
+    server_version = 'SHEguru/0.3'
 
     def log_message(self, fmt, *args):
         # Do not log request bodies, employee records or session tokens.
