@@ -23,7 +23,7 @@ GROUPS = ('employees', 'appointments', 'training', 'tasks', 'requirements')
 def template_catalogue():
     rows = json.loads((ROOT / 'templates/catalogue.json').read_text())
     names = [r['file'] for r in rows]
-    if len(names) != len(set(names)) or any(not re.fullmatch(r'[a-z0-9-]+\.(txt|csv)', name) for name in names):
+    if len(names) != len(set(names)) or any(not re.fullmatch(r'[a-z0-9-]+\.(txt|csv|docx|xlsx)', name) for name in names):
         raise ValueError('Invalid template catalogue filenames.')
     if any(r['section'] not in ('appointment', 'document') for r in rows):
         raise ValueError('Invalid template catalogue section.')
@@ -304,7 +304,7 @@ class Store:
 
 
 class Handler(BaseHTTPRequestHandler):
-    server_version = 'SHEguru/0.5'
+    server_version = 'SHEguru/0.6'
 
     def log_message(self, fmt, *args):
         # Do not log request bodies, employee records or session tokens.

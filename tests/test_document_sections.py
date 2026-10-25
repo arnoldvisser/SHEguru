@@ -1,6 +1,8 @@
 """Document filing, old-schema upgrades and blank-template delivery."""
 import json
 import csv
+import zipfile
+import xml.etree.ElementTree as ET
 from pathlib import Path
 import sqlite3
 import tempfile
@@ -89,9 +91,9 @@ class DocumentSectionHTTPTests(unittest.TestCase):
         self.assertEqual(len(catalogue), 29)
         self.assertEqual({row['requirement'] for row in catalogue if row['section'] == 'appointment'},
                          {row['id'] for row in before['state']['requirements'] if row['kind'] == 'appointment'})
-        expected_legal = {'investigation-report.txt', 'risk-assessment.csv', 'root-cause-analysis.txt',
-                          'vehicle-inspection.csv', 'ppe-inspection.csv', 'hand-tool-inspection.csv',
-                          'electric-tool-inspection.csv', 'ladder-inspection.csv', 'section-37-2-agreement.txt'}
+        expected_legal = {'investigation-report.docx', 'risk-assessment.xlsx', 'root-cause-analysis.docx',
+                          'vehicle-inspection.xlsx', 'ppe-inspection.xlsx', 'hand-tool-inspection.xlsx',
+                          'electric-tool-inspection.xlsx', 'ladder-inspection.xlsx', 'section-37-2-agreement.docx'}
         self.assertTrue(expected_legal <= {row['file'] for row in catalogue if row['section'] == 'document'})
         for row in catalogue:
             name = row['file']
@@ -120,6 +122,34 @@ class DocumentSectionHTTPTests(unittest.TestCase):
             self.assertTrue(all(row['Inspector'] == '' and row['Released for use by / date'] == '' for row in rows))
             checklists.append(tuple(row['Check item'] for row in rows))
         self.assertEqual(len(set(checklists)), 5)
+
+    def test_office_templates_have_readable_structure_and_separate_cells(self):
+        catalogue = json.loads((ROOT / 'templates/catalogue.json').read_text())
+        self.assertEqual(sum(r['file'].endswith('.docx') for r in catalogue), 22)
+        self.assertEqual(sum(r['file'].endswith('.xlsx') for r in catalogue), 7)
+        for item in catalogue:
+            with self.subTest(file=item['file']), zipfile.ZipFile(ROOT / 'templates' / item['file']) as office:
+                self.assertIsNone(office.testzip())
+                if item['file'].endswith('.docx'):
+                    doc = ET.fromstring(office.read('word/document.xml'))
+                    text = ''.join(doc.itertext())
+                    self.assertIn(item['label'], text)
+                    self.assertIn('WORKING TEMPLATE', text)
+                    self.assertIsNotNone(doc.find('.//{http://schemas.openxmlformats.org/wordprocessingml/2006/main}tbl'))
+                else:
+                    ns = {'s': 'http://schemas.openxmlformats.org/spreadsheetml/2006/main'}
+                    sheet = ET.fromstring(office.read('xl/worksheets/sheet1.xml'))
+                    cells = {c.attrib['r']: c for c in sheet.findall('.//s:c', ns)}
+                    for address in ('A9', 'B9', 'C9', 'H9'):
+                        self.assertIn(address, cells)
+                    self.assertEqual(sheet.find('s:sheetViews/s:sheetView/s:pane', ns).attrib['topLeftCell'], 'C10')
+                    if item['file'] != 'risk-assessment.xlsx':
+                        self.assertIsNotNone(sheet.find('s:dataValidations', ns))
+                        self.assertFalse(''.join(cells['C10'].itertext()).strip())
+        with zipfile.ZipFile(ROOT / 'SHEguru-Word-Excel-templates.zip') as pack:
+            self.assertEqual(sum(n.endswith(('.docx', '.xlsx')) for n in pack.namelist()), 29)
+            self.assertTrue(any(n.startswith('1-Appointments/') for n in pack.namelist()))
+            self.assertTrue(any(n.startswith('2-Legal-documents/') for n in pack.namelist()))
 
     def test_refiling_endpoint(self):
         with self.request('/api/documents', {'name': 'policy.txt', 'category': 'Policy', 'section': 'document', 'content': 'YWJj'}, 'POST') as r:
