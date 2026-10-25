@@ -1,0 +1,2 @@
+Company,Workplace / area,Inspection type,Inspection date,Inspector,Item / equipment,Inspection criterion,Finding (satisfactory / defect / not applicable),Defect / hazard,Immediate control,Corrective action,Action owner,Due date,Closed date,Verified by,Next inspection date
+[Company],[Workplace],[Select inspection],[YYYY-MM-DD],[Inspector],[Item inspected],[Applicable check],[Finding],[Describe defect],[Immediate action],[Required correction],[Responsible person],[YYYY-MM-DD],[YYYY-MM-DD],[Verifier],[YYYY-MM-DD]

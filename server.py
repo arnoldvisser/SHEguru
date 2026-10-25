@@ -28,6 +28,20 @@ def migrate(state):
     # Add the checklist without changing existing records or attachment data.
     if 'requirements' not in state:
         state['requirements'] = starter_requirements()
+    else:
+        # Add newly introduced standard items; retain every existing decision and link.
+        known = {r['id'] for r in state['requirements']}
+        for row in starter_requirements():
+            if row['id'] in {'document-19', 'document-20'} and row['id'] not in known:
+                state['requirements'].append(row)
+    standard_labels = {
+        'document-2': ('Workplace hazard identification and risk assessments', 'Standard risk assessment document'),
+        'document-5': ('Health and safety committee records and minutes', 'HSE committee minutes'),
+    }
+    for row in state['requirements']:
+        labels = standard_labels.get(row['id'])
+        if labels and row['name'] == labels[0]:
+            row['name'] = labels[1]
     return state
 
 
@@ -187,6 +201,9 @@ class Store:
                 (id TEXT PRIMARY KEY, name TEXT NOT NULL, category TEXT NOT NULL,
                  uploaded_at TEXT NOT NULL, size INTEGER NOT NULL, sha256 TEXT NOT NULL, content BLOB NOT NULL);
             ''')
+            columns = {r['name'] for r in con.execute('PRAGMA table_info(attachments)')}
+            if 'section' not in columns:
+                con.execute("ALTER TABLE attachments ADD COLUMN section TEXT NOT NULL DEFAULT 'unfiled'")
             con.execute('INSERT OR IGNORE INTO workspace VALUES(1,0,?)', (json.dumps(empty_state()),))
 
     @contextmanager
@@ -232,11 +249,14 @@ class Store:
 
     def list_files(self):
         with self.connect() as con:
-            return [dict(r) for r in con.execute('SELECT id,name,category,uploaded_at,size,sha256 FROM attachments ORDER BY uploaded_at DESC')]
+            return [dict(r) for r in con.execute('SELECT id,name,category,uploaded_at,size,sha256,section FROM attachments ORDER BY uploaded_at DESC')]
 
     def upload(self, payload):
         name = text(payload.get('name'), 'file name', True, 250)
         category = text(payload.get('category'), 'document category', True, 100)
+        section = payload.get('section', 'unfiled')
+        if section not in ('appointment', 'document', 'unfiled'):
+            raise Invalid('Choose Appointments or Legal documents.')
         if '/' in name or '\\' in name or any(ord(c) < 32 for c in name):
             raise Invalid('Use a simple file name without folders.')
         if Path(name).suffix.lower() not in {'.pdf', '.png', '.jpg', '.jpeg', '.txt', '.csv', '.docx', '.xlsx'}:
@@ -249,10 +269,22 @@ class Store:
             raise Invalid('Choose a file between 1 byte and 10 MB.')
         ident = secrets.token_hex(16)
         with self.lock, self.connect() as con:
-            con.execute('INSERT INTO attachments VALUES(?,?,?,?,?,?,?)',
-                        (ident, name, category, now(), len(content), hashlib.sha256(content).hexdigest(), content))
+            con.execute('INSERT INTO attachments(id,name,category,uploaded_at,size,sha256,content,section) VALUES(?,?,?,?,?,?,?,?)',
+                        (ident, name, category, now(), len(content), hashlib.sha256(content).hexdigest(), content, section))
             con.execute('INSERT INTO audit(timestamp,action) VALUES(?,?)', (now(), f'Document uploaded: {name}'))
         return {'id': ident}
+
+    def file_section(self, ident, section):
+        if section not in ('appointment', 'document'):
+            raise Invalid('Choose Appointments or Legal documents.')
+        with self.lock, self.connect() as con:
+            row = con.execute('SELECT name FROM attachments WHERE id=?', (ident,)).fetchone()
+            if row is None:
+                raise Invalid('Document not found.')
+            con.execute('UPDATE attachments SET section=? WHERE id=?', (section, ident))
+            label = 'Appointments' if section == 'appointment' else 'Legal documents'
+            con.execute('INSERT INTO audit(timestamp,action) VALUES(?,?)', (now(), f'Document filed under {label}: {row["name"]}'))
+        return {'id': ident, 'section': section}
 
     def backup(self):
         # A SQLite online backup captures state, audit and uploaded files in one consistent snapshot.
@@ -262,7 +294,7 @@ class Store:
 
 
 class Handler(BaseHTTPRequestHandler):
-    server_version = 'SHEguru/0.3'
+    server_version = 'SHEguru/0.4'
 
     def log_message(self, fmt, *args):
         # Do not log request bodies, employee records or session tokens.
@@ -318,6 +350,13 @@ class Handler(BaseHTTPRequestHandler):
             self.send(200, self.server.store.state())
         elif path == '/api/documents':
             self.send(200, self.server.store.list_files())
+        elif path.startswith('/api/templates/'):
+            name = path.rsplit('/', 1)[1]
+            if name not in {'policy.txt', 'risk-assessment.csv', 'inspection-sheet.csv', 'near-miss-report.txt', 'hse-committee-minutes.txt'}:
+                self.send(404, {'error': 'Template not found.'})
+            else:
+                self.send(200, (ROOT / 'templates' / name).read_bytes(), 'application/octet-stream',
+                          {'Content-Disposition': f'attachment; filename="SHEguru-{name}"'})
         elif path == '/api/audit':
             with self.server.store.connect() as con:
                 self.send(200, [dict(r) for r in con.execute('SELECT * FROM audit ORDER BY id DESC LIMIT 500')])
@@ -351,6 +390,8 @@ class Handler(BaseHTTPRequestHandler):
                 raise Invalid('Expected a JSON object.')
             if method == 'PUT' and path == '/api/state':
                 self.send(200, self.server.store.save(payload.get('state'), payload.get('revision')))
+            elif method == 'POST' and re.fullmatch(r'/api/documents/[a-f0-9]{32}/section', path):
+                self.send(200, self.server.store.file_section(path.split('/')[3], payload.get('section')))
             elif method == 'POST' and path == '/api/documents':
                 self.send(201, self.server.store.upload(payload))
             else:

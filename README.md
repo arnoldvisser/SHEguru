@@ -1,4 +1,4 @@
-# SHEguru — laptop application, v0.3
+# SHEguru — laptop application, v0.4
 
 Health and safety record management for a South African SME. This first application edition runs on one laptop, opens in a browser and saves data in SQLite. It has no third-party runtime dependencies and no online account is required.
 
@@ -14,11 +14,11 @@ Visual Studio Code is optional. Opening `web/index.html` directly will not run t
 
 On macOS/Linux: `python3 server.py`. Advanced options: `python server.py --no-browser --port 8766 --data-dir /path/to/records`.
 
-## Appointment and company-document checklists (v0.3)
+## Appointment and company-document checklists (v0.4)
 
 SHEguru targets SMEs with 10 or more employees across industries. This is a product scope, not a universal statutory threshold: duties apply according to the relevant legislation, workplace and hazards. For example, OHS Act section 17 generally uses more than 20 employees at a workplace for health and safety representative designation.
 
-- **Appointments** includes 16 starter role categories; **Documents** includes 18 starter document categories. Each shows a legal / regulatory reference and applicability notes, including conditional construction, machinery and chemical requirements. The source catalogue is `requirements.json`.
+- **Appointments** includes 16 starter role categories; **Documents** includes 20 starter document categories. Each shows a legal / regulatory reference and applicability notes, including conditional construction, machinery and chemical requirements. The source catalogue is `requirements.json`.
 - Review each requirement as **Required**, **Not applicable** (with a reason), or leave it as **Review required**. Add company-specific requirements, including separate people, shifts or sites. The starter catalogue is for workplace review, not an exhaustive or independently verified current legal register. Mines, specialist industries, municipal rules and client requirements may need additional items and competent advice.
 - Create the appointee in the appointment register, then use **Review / link evidence** on the corresponding requirement to link that appointment. Upload its signed letter directly from the requirement, or link an existing library file. Confirm that the letter names the active appointee. The software records that confirmation; it does not authenticate signatures, qualifications or document contents.
 - An applicable appointment stays outstanding until it has an active appointee and linked signed evidence. Changing the appointee requires new confirmation / evidence. Unlinked appointment records also appear as outstanding on the report.
@@ -26,13 +26,24 @@ SHEguru targets SMEs with 10 or more employees across industries. This is a prod
 - **Reports** includes all requirements, outstanding statuses, assigned people, uploaded filenames, legal references, applicability reasons and notes. Use **Print / save PDF** to export it. Pending applicability decisions are counted separately in the summary and included in the outstanding total. “Evidence recorded” is not a compliance certification.
 - Old databases gain the starter checklist without deleting existing records or uploads. Checklists and links are retained in the full SQLite backup. No separate database conversion command is needed.
 
+### Documents has two sections
+
+1. **Appointments** — appointment requirements, signed letters, appointment letter drafts and uploaded appointment records.
+2. **Legal documents** — policies, standard risk assessments, inspection sheets, near-miss reports, HSE committee minutes and other company legal / safety evidence.
+
+Each section has its own checklist and upload list. Uploads record their section and can be moved with **File under…**. Existing files are preserved: linked evidence is grouped using its requirement; unclassified legacy uploads appear under Legal documents with a prompt to choose a section. Moving a file does not remove its checklist links or content.
+
+Legal documents includes blank policy, near-miss and committee-minutes text templates, plus risk assessment and inspection CSV forms for Excel. Adapt, complete and approve these for the workplace. A downloaded blank form is not uploaded evidence and never clears an outstanding requirement. Templates are starter forms rather than approved policies or completed company records.
+
+Existing checklists gain inspection-sheet and near-miss requirements without resetting decisions, notes or evidence links. Document sections are retained in database backups.
+
 ### Updating a Windows installation safely
 
 1. In the old app, use **Settings → Download full backup**; keep that backup separate.
 2. Close the app’s command window and browser tabs.
-3. Extract the updated download into a **new folder**, keeping the old installation intact. The new folder must include `requirements.json`, `server.py`, the launchers and the complete `web` directory.
+3. Extract the updated download into a **new folder**, keeping the old installation intact. The new folder must include `requirements.json`, `server.py`, the launchers, `templates` directory and the complete `web` directory.
 4. To keep existing records, create a `data` folder inside the new folder and copy the backup into it as `sheguru.sqlite3`. Preserve the original backup.
-5. Run **Start-SHEguru.bat** in the new folder. Reopen the browser so it loads the new version. Confirm the sidebar says **Laptop edition · 0.3**.
+5. Run **Start-SHEguru.bat** in the new folder. Reopen the browser so it loads the new version. Confirm the sidebar says **Laptop edition · 0.4**.
 
 ## Working features
 

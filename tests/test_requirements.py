@@ -20,7 +20,7 @@ class RequirementTests(unittest.TestCase):
 
     def test_starter_covers_both_kinds_without_assuming_applicability(self):
         rows = self.store.state()['state']['requirements']
-        self.assertEqual(len(rows), 34)
+        self.assertEqual(len(rows), 36)
         self.assertEqual({r['kind'] for r in rows}, {'appointment', 'document'})
         self.assertTrue(all(r['applicability'] == 'pending' and r['condition'] and r['legalBasis'] for r in rows))
 
@@ -35,7 +35,7 @@ class RequirementTests(unittest.TestCase):
         self.assertEqual(result['revision'], 7)
         self.assertEqual(result['state']['appointments'], old['appointments'])
         self.assertEqual(result['state']['employees'], old['employees'])
-        self.assertEqual(len(result['state']['requirements']), 34)
+        self.assertEqual(len(result['state']['requirements']), 36)
         self.assertEqual(reopened.list_files()[0]['id'], ident)
         reopened.save(result['state'], 7)
         self.assertEqual(reopened.state()['revision'], 8)

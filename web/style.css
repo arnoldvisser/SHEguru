@@ -34,3 +34,7 @@ textarea{width:100%;min-height:95px;padding:11px;font:inherit;border:1px solid #
   .safety-report th:nth-child(5) {width:18%}
   .safety-report td p {line-height:1.3;margin:6px 0}
 }
+.document-sections {display:flex;gap:12px;flex-wrap:wrap;margin:0 0 28px}
+.document-section {scroll-margin-top:20px;margin-bottom:48px;padding-top:12px;border-top:2px solid #dce5e5}
+.document-section>h3 {margin-top:26px}
+.document-section .checklist {margin-top:30px}
