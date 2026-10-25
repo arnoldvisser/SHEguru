@@ -1,0 +1,57 @@
+SHEguru — INCIDENT INVESTIGATION REPORT — BLANK WORKING TEMPLATE
+Adapt to the event and applicable duties. Do not delay emergency response or
+required notifications. This report does not replace an official statutory form.
+
+1. REPORT CONTROL
+Company / workplace:
+Incident reference / report version:
+Event date / time / location:
+Report date:
+Investigator(s) / competence / appointment:
+Reviewing manager:
+
+2. EVENT AND IMMEDIATE RESPONSE
+Type: injury / illness / damage / dangerous occurrence / near miss / other:
+Activity being performed:
+People involved / witnesses (necessary details only):
+Factual description and timeline:
+Actual harm / damage and potential consequences:
+Emergency response / first aid / medical referral:
+Area made safe / equipment isolated / immediate controls:
+Scene and evidence preservation arrangements:
+
+3. NOTIFICATION AND RECORDING
+Applicable statutory reporting requirements assessed by / date:
+Required authority / notification method / deadline:
+Notification completed by / date / reference (or reason not reportable):
+Other notifications (management / client / insurer / representatives):
+Required register / prescribed form references:
+
+4. EVIDENCE
+Evidence ID | Description | Source / collection date | Custodian / storage
+Witness accounts and interview references:
+Photographs / diagrams / equipment records:
+Relevant risk assessments / procedures / training / maintenance records:
+Distinguish confirmed facts from accounts, assumptions and unresolved questions.
+
+5. ANALYSIS
+Immediate causes and evidence:
+Contributing factors (task, equipment, environment, people, supervision, systems):
+Supported root causes / linked root cause analysis reference:
+Existing controls and why they did not prevent the event:
+Information still needed / limits of the investigation:
+
+6. CORRECTIVE AND PREVENTIVE ACTIONS
+Finding | Control / action | Owner | Due date | Priority | Completion evidence
+Prefer controlling hazards at source; do not rely only on reminders or retraining.
+
+7. VERIFICATION AND CLOSE-OUT
+Risk assessment / procedure / training updates:
+Consultation and lessons communicated to / date:
+Action effectiveness check / evidence / date:
+Outstanding actions and escalation:
+Investigator signature / date:
+Management review and approval / date:
+Employee representative participation / comments, where applicable:
+Closure authorised by / date:
+Attachments / controlled record location:

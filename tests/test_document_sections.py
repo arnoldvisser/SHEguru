@@ -1,11 +1,12 @@
 """Document filing, old-schema upgrades and blank-template delivery."""
 import json
+import csv
 from pathlib import Path
 import sqlite3
 import tempfile
 import unittest
 
-from server import Store, Invalid, empty_state
+from server import Store, Invalid, empty_state, ROOT
 import test_server
 
 sample = test_server.sample
@@ -82,7 +83,18 @@ class DocumentSectionHTTPTests(unittest.TestCase):
 
     def test_template_downloads_do_not_complete_any_requirement(self):
         before = self.server.store.state()
-        for name in ('policy.txt', 'risk-assessment.csv', 'inspection-sheet.csv', 'near-miss-report.txt', 'hse-committee-minutes.txt'):
+        with self.request('/api/templates') as response:
+            self.assertEqual(response.status, 200)
+            catalogue = json.load(response)
+        self.assertEqual(len(catalogue), 29)
+        self.assertEqual({row['requirement'] for row in catalogue if row['section'] == 'appointment'},
+                         {row['id'] for row in before['state']['requirements'] if row['kind'] == 'appointment'})
+        expected_legal = {'investigation-report.txt', 'risk-assessment.csv', 'root-cause-analysis.txt',
+                          'vehicle-inspection.csv', 'ppe-inspection.csv', 'hand-tool-inspection.csv',
+                          'electric-tool-inspection.csv', 'ladder-inspection.csv', 'section-37-2-agreement.txt'}
+        self.assertTrue(expected_legal <= {row['file'] for row in catalogue if row['section'] == 'document'})
+        for row in catalogue:
+            name = row['file']
             with self.subTest(name=name), self.request('/api/templates/' + name) as r:
                 self.assertEqual(r.status, 200)
                 self.assertGreater(len(r.read()), 100)
@@ -91,8 +103,23 @@ class DocumentSectionHTTPTests(unittest.TestCase):
         self.assertEqual(self.server.store.list_files(), [])
         with self.request('/api/templates/policy.txt', authenticated=False) as r:
             self.assertEqual(r.status, 403)
-        with self.request('/api/templates/server.py') as r:
-            self.assertEqual(r.status, 404)
+        for path in ('/api/templates/server.py', '/api/templates/catalogue.json', '/api/templates/nested/policy.txt'):
+            with self.subTest(path=path), self.request(path) as r:
+                self.assertEqual(r.status, 404)
+        with self.request('/api/templates', authenticated=False) as r:
+            self.assertEqual(r.status, 403)
+
+    def test_inspection_templates_have_distinct_checks_and_blank_findings(self):
+        checklists = []
+        for name in ('vehicle-inspection.csv', 'ppe-inspection.csv', 'hand-tool-inspection.csv', 'electric-tool-inspection.csv', 'ladder-inspection.csv'):
+            with (ROOT / 'templates' / name).open(newline='') as handle:
+                rows = list(csv.DictReader(handle))
+            self.assertGreaterEqual(len(rows), 10)
+            self.assertTrue(all(row['Check item'] and row['Inspection criterion'] for row in rows))
+            self.assertTrue(all(row['Finding (OK / Defect / Not applicable)'] == '' for row in rows))
+            self.assertTrue(all(row['Inspector'] == '' and row['Released for use by / date'] == '' for row in rows))
+            checklists.append(tuple(row['Check item'] for row in rows))
+        self.assertEqual(len(set(checklists)), 5)
 
     def test_refiling_endpoint(self):
         with self.request('/api/documents', {'name': 'policy.txt', 'category': 'Policy', 'section': 'document', 'content': 'YWJj'}, 'POST') as r:

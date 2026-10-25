@@ -1,4 +1,4 @@
-# SHEguru — laptop application, v0.4
+# SHEguru — laptop application, v0.5
 
 Health and safety record management for a South African SME. This first application edition runs on one laptop, opens in a browser and saves data in SQLite. It has no third-party runtime dependencies and no online account is required.
 
@@ -14,7 +14,7 @@ Visual Studio Code is optional. Opening `web/index.html` directly will not run t
 
 On macOS/Linux: `python3 server.py`. Advanced options: `python server.py --no-browser --port 8766 --data-dir /path/to/records`.
 
-## Appointment and company-document checklists (v0.4)
+## Appointment and company-document checklists (v0.5)
 
 SHEguru targets SMEs with 10 or more employees across industries. This is a product scope, not a universal statutory threshold: duties apply according to the relevant legislation, workplace and hazards. For example, OHS Act section 17 generally uses more than 20 employees at a workplace for health and safety representative designation.
 
@@ -33,7 +33,9 @@ SHEguru targets SMEs with 10 or more employees across industries. This is a prod
 
 Each section has its own checklist and upload list. Uploads record their section and can be moved with **File under…**. Existing files are preserved: linked evidence is grouped using its requirement; unclassified legacy uploads appear under Legal documents with a prompt to choose a section. Moving a file does not remove its checklist links or content.
 
-Legal documents includes blank policy, near-miss and committee-minutes text templates, plus risk assessment and inspection CSV forms for Excel. Adapt, complete and approve these for the workplace. A downloaded blank form is not uploaded evidence and never clears an outstanding requirement. Templates are starter forms rather than approved policies or completed company records.
+The appointment section includes 16 role-specific text templates covering the starter appointment categories, including a section 16(2) delegation, representatives, committee members, first aid, emergencies and conditional construction / equipment roles. Each draft includes tailored proposed duties, applicability and competence notes, workplace scope, resources, acceptance and signatures. Templates can be downloaded before a person is assigned, including from the corresponding checklist row.
+
+Legal documents includes 13 templates: policy, risk assessment, general inspection, near-miss report, HSE committee minutes, investigation report, root cause analysis, vehicle inspection, PPE inspection, hand tool inspection, electric tools inspection, ladder inspection and a **section 37(2) contractor agreement**. The agreement interprets the requested “32.7 agreement” as section 37(2) of the OHS Act; confirm that reference and obtain suitable review before using it. Inspection CSVs contain equipment-specific check items and blank findings, corrective actions and release fields. Text templates open in Word / Notepad; CSVs open in Excel. The allowlisted catalogue is `templates/catalogue.json`. Adapt, complete and approve these for the workplace. A downloaded blank form is not uploaded evidence and never clears an outstanding requirement. Templates are starter forms rather than approved policies, executed agreements or completed company records. Adding these templates does not add required-upload checklist items; the company-specific required document list will be specified separately.
 
 Existing checklists gain inspection-sheet and near-miss requirements without resetting decisions, notes or evidence links. Document sections are retained in database backups.
 
@@ -43,7 +45,7 @@ Existing checklists gain inspection-sheet and near-miss requirements without res
 2. Close the app’s command window and browser tabs.
 3. Extract the updated download into a **new folder**, keeping the old installation intact. The new folder must include `requirements.json`, `server.py`, the launchers, `templates` directory and the complete `web` directory.
 4. To keep existing records, create a `data` folder inside the new folder and copy the backup into it as `sheguru.sqlite3`. Preserve the original backup.
-5. Run **Start-SHEguru.bat** in the new folder. Reopen the browser so it loads the new version. Confirm the sidebar says **Laptop edition · 0.4**.
+5. Run **Start-SHEguru.bat** in the new folder. Reopen the browser so it loads the new version. Confirm the sidebar says **Laptop edition · 0.5**.
 
 ## Working features
 

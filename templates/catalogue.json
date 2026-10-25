@@ -1,0 +1,163 @@
+[
+  {
+    "section": "appointment",
+    "file": "appointment-section-16-2-delegation.txt",
+    "label": "Section 16(2) delegation of duties",
+    "requirement": "appointment-1"
+  },
+  {
+    "section": "appointment",
+    "file": "appointment-health-safety-representative.txt",
+    "label": "Health and safety representative",
+    "requirement": "appointment-2"
+  },
+  {
+    "section": "appointment",
+    "file": "appointment-hse-committee-member.txt",
+    "label": "HSE committee member",
+    "requirement": "appointment-3"
+  },
+  {
+    "section": "appointment",
+    "file": "appointment-first-aider.txt",
+    "label": "First aider",
+    "requirement": "appointment-4"
+  },
+  {
+    "section": "appointment",
+    "file": "appointment-fire-emergency-coordinator.txt",
+    "label": "Fire and emergency coordinator",
+    "requirement": "appointment-5"
+  },
+  {
+    "section": "appointment",
+    "file": "appointment-construction-manager.txt",
+    "label": "Construction manager",
+    "requirement": "appointment-6"
+  },
+  {
+    "section": "appointment",
+    "file": "appointment-construction-supervisor.txt",
+    "label": "Construction supervisor",
+    "requirement": "appointment-7"
+  },
+  {
+    "section": "appointment",
+    "file": "appointment-construction-hse-officer.txt",
+    "label": "Construction health and safety officer",
+    "requirement": "appointment-8"
+  },
+  {
+    "section": "appointment",
+    "file": "appointment-construction-risk-assessor.txt",
+    "label": "Construction risk assessment competent person",
+    "requirement": "appointment-9"
+  },
+  {
+    "section": "appointment",
+    "file": "appointment-fall-protection-planner.txt",
+    "label": "Fall protection plan competent person",
+    "requirement": "appointment-10"
+  },
+  {
+    "section": "appointment",
+    "file": "appointment-scaffolding-competent-person.txt",
+    "label": "Scaffolding competent person \u2014 select specific function",
+    "requirement": "appointment-11"
+  },
+  {
+    "section": "appointment",
+    "file": "appointment-excavation-competent-person.txt",
+    "label": "Excavation competent person",
+    "requirement": "appointment-12"
+  },
+  {
+    "section": "appointment",
+    "file": "appointment-lifting-equipment-competent-person.txt",
+    "label": "Lifting equipment competent person \u2014 select specific function",
+    "requirement": "appointment-13"
+  },
+  {
+    "section": "appointment",
+    "file": "appointment-machinery-supervisor.txt",
+    "label": "Machinery supervision competent person",
+    "requirement": "appointment-14"
+  },
+  {
+    "section": "appointment",
+    "file": "appointment-hazardous-chemical-assessor.txt",
+    "label": "Hazardous chemical agent assessment competent person",
+    "requirement": "appointment-15"
+  },
+  {
+    "section": "appointment",
+    "file": "appointment-incident-investigator.txt",
+    "label": "Incident investigator",
+    "requirement": "appointment-16"
+  },
+  {
+    "section": "document",
+    "file": "policy.txt",
+    "label": "Health and safety policy"
+  },
+  {
+    "section": "document",
+    "file": "risk-assessment.csv",
+    "label": "Risk assessment"
+  },
+  {
+    "section": "document",
+    "file": "inspection-sheet.csv",
+    "label": "General workplace inspection sheet"
+  },
+  {
+    "section": "document",
+    "file": "near-miss-report.txt",
+    "label": "Near-miss report"
+  },
+  {
+    "section": "document",
+    "file": "hse-committee-minutes.txt",
+    "label": "HSE committee minutes"
+  },
+  {
+    "section": "document",
+    "file": "investigation-report.txt",
+    "label": "Investigation report"
+  },
+  {
+    "section": "document",
+    "file": "root-cause-analysis.txt",
+    "label": "Root cause analysis"
+  },
+  {
+    "section": "document",
+    "file": "vehicle-inspection.csv",
+    "label": "Vehicle inspection sheet"
+  },
+  {
+    "section": "document",
+    "file": "ppe-inspection.csv",
+    "label": "PPE inspection sheet"
+  },
+  {
+    "section": "document",
+    "file": "hand-tool-inspection.csv",
+    "label": "Hand tool inspection sheet"
+  },
+  {
+    "section": "document",
+    "file": "electric-tool-inspection.csv",
+    "label": "Electric tools inspection sheet"
+  },
+  {
+    "section": "document",
+    "file": "ladder-inspection.csv",
+    "label": "Ladder inspection sheet"
+  },
+  {
+    "section": "document",
+    "file": "section-37-2-agreement.txt",
+    "label": "Section 37(2) contractor agreement"
+  }
+]

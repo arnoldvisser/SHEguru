@@ -16,7 +16,7 @@ This is the first evaluation version. Payroll integration, online training,
 certificate issuance, incident management and risk registers come in later stages.
 See README.md for details and backup/restore instructions.
 
-VERSION 0.4: APPOINTMENT AND DOCUMENT CHECKLISTS
+VERSION 0.5: APPOINTMENT AND DOCUMENT CHECKLISTS
 Appointments: review the listed requirements, assign people and link signed letters.
 Documents has two sections: 1. Appointments and 2. Legal documents.
 Legal documents includes policy, risk assessment, inspection, near-miss and HSE
@@ -25,3 +25,11 @@ Reports: see missing items and print / save a PDF report.
 Not every starter item applies to every company. Record applicability decisions.
 Before updating an existing installation, download a full backup and keep the old
 folder. See README.md for safe update and restore steps.
+
+TEMPLATE LIBRARY (VERSION 0.5)
+Appointments includes 16 role-specific letter drafts.
+Legal documents includes investigation, root cause analysis and vehicle, PPE,
+hand tool, electric tool and ladder inspection forms alongside existing templates.
+The contractor agreement is labelled section 37(2), interpreting “32.7”.
+Text files open in Word / Notepad; CSV inspection forms open in Excel.
+Downloading a template does not complete a required upload.

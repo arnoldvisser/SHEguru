@@ -1,0 +1,45 @@
+SHEguru — ROOT CAUSE ANALYSIS — BLANK WORKING TEMPLATE
+Use alongside the incident investigation or other defined problem. Record
+supporting evidence; do not force five answers or assume worker error is the cause.
+
+Company / workplace:
+Problem / incident reference:
+Analysis date / team / facilitator:
+Scope and desired outcome:
+
+1. PROBLEM STATEMENT
+What happened, where and when? What should have happened?
+Actual / potential consequences:
+Facts confirmed / evidence references:
+Unknowns / assumptions to test:
+
+2. SEQUENCE AND CONTROL FAILURES
+Event / step | Expected control | Observed condition | Evidence
+
+3. CONTRIBUTING FACTORS
+Task / method:
+Equipment / materials:
+Work environment:
+Information / competence / workload:
+Supervision / planning / resources:
+Management systems / change control:
+Evidence supporting or rejecting each proposed factor:
+
+4. WHY ANALYSIS (REPEAT OR BRANCH AS THE EVIDENCE REQUIRES)
+Starting problem:
+Why? Answer / evidence / verified by:
+Why did that condition exist? Answer / evidence / verified by:
+Why did the system allow it? Answer / evidence / verified by:
+Further question(s) / answer(s) / evidence:
+Alternative explanations and how they were tested:
+
+5. SUPPORTED ROOT CAUSES
+Cause | Evidence | Control / system gap | Link to the event
+Causes not yet confirmed / additional investigation required:
+
+6. ACTIONS AND EFFECTIVENESS
+Cause | Preventive control | Action owner | Due date | Completion evidence
+Effectiveness measure / review date / reviewer:
+Risk assessment / procedure / design changes:
+Residual risk / further actions:
+Analysis reviewed and approved by / date:

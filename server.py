@@ -20,6 +20,16 @@ MAX_FILE = 10 * 1024 * 1024
 GROUPS = ('employees', 'appointments', 'training', 'tasks', 'requirements')
 
 
+def template_catalogue():
+    rows = json.loads((ROOT / 'templates/catalogue.json').read_text())
+    names = [r['file'] for r in rows]
+    if len(names) != len(set(names)) or any(not re.fullmatch(r'[a-z0-9-]+\.(txt|csv)', name) for name in names):
+        raise ValueError('Invalid template catalogue filenames.')
+    if any(r['section'] not in ('appointment', 'document') for r in rows):
+        raise ValueError('Invalid template catalogue section.')
+    return rows
+
+
 def starter_requirements():
     return json.loads((ROOT / 'requirements.json').read_text())
 
@@ -294,7 +304,7 @@ class Store:
 
 
 class Handler(BaseHTTPRequestHandler):
-    server_version = 'SHEguru/0.4'
+    server_version = 'SHEguru/0.5'
 
     def log_message(self, fmt, *args):
         # Do not log request bodies, employee records or session tokens.
@@ -350,9 +360,11 @@ class Handler(BaseHTTPRequestHandler):
             self.send(200, self.server.store.state())
         elif path == '/api/documents':
             self.send(200, self.server.store.list_files())
+        elif path == '/api/templates':
+            self.send(200, template_catalogue())
         elif path.startswith('/api/templates/'):
             name = path.rsplit('/', 1)[1]
-            if name not in {'policy.txt', 'risk-assessment.csv', 'inspection-sheet.csv', 'near-miss-report.txt', 'hse-committee-minutes.txt'}:
+            if path != '/api/templates/' + name or name not in {r['file'] for r in template_catalogue()}:
                 self.send(404, {'error': 'Template not found.'})
             else:
                 self.send(200, (ROOT / 'templates' / name).read_bytes(), 'application/octet-stream',

@@ -5,6 +5,7 @@ const context={document:{querySelector:node,querySelectorAll:()=>[],addEventList
 vm.createContext(context);
 let code=fs.readFileSync(require('node:path').join(__dirname,'../web/app.js'),'utf8');
 vm.runInContext(code.slice(0,code.lastIndexOf('\nload().then(render)')),context);
+vm.runInContext('templateCatalogue='+fs.readFileSync(require('node:path').join(__dirname,'../templates/catalogue.json'),'utf8'),context);
 (async()=>{
 await vm.runInContext(`(async()=>{
 state={company:{name:'Example <unsafe>',industry:'Workshop',location:'Gauteng'},employees:[{id:'e1',name:'First employee',active:true},{id:'e2',name:'Replacement',active:true}],appointments:[{id:'a1',role:'First aider',employee:'e1',due:offset(30)}],training:[],tasks:[],requirements:[]};
@@ -25,8 +26,10 @@ for(const text of ['1 outstanding','signed-first-aider.pdf','Upload missing','Fi
 if(!checklist('appointment').includes('Review / link evidence'))throw Error('Missing checklist action');
 state.appointments.push({id:'a2',role:'Unlinked appointment',employee:'',due:offset(30)});
 if(outstandingCount()!==2||!report().includes('Unlinked appointment'))throw Error('Unlinked appointment missing from report');
+if(!templateButtons('appointment').includes('Section 16(2) delegation of duties'))throw Error('Appointment template catalogue missing');
+for(const label of ['Investigation report','Root cause analysis','PPE inspection sheet','Hand tool inspection sheet','Electric tools inspection sheet','Ladder inspection sheet','Section 37(2) contractor agreement'])if(!templateButtons('document').includes(label))throw Error('Missing requested template: '+label);
 const documentHtml=documentsPage();
-for(const label of ['1. Appointments','2. Legal documents','Standard risk assessment','Inspection sheet','Near-miss report','HSE committee minutes','appointmentDocumentRows','legalDocumentRows'])if(!documentHtml.includes(label))throw Error('Missing document section content: '+label);
+for(const label of ['1. Appointments','2. Legal documents','Risk assessment','Vehicle inspection sheet','Near-miss report','HSE committee minutes','appointmentDocumentRows','legalDocumentRows'])if(!documentHtml.includes(label))throw Error('Missing document section content: '+label);
 if(documentSection({id:'file1',section:'unfiled'})!=='appointment')throw Error('Legacy linked letter not classified as appointment');
 if(documentSection({id:'legacy',section:'unfiled'})!=='unfiled')throw Error('Unknown legacy upload was guessed');
 if(documentSection({id:'new',section:'document'})!=='document')throw Error('Explicit legal-document classification lost');
